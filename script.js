@@ -1,110 +1,160 @@
-const PRODUCTS=[
-  {id:1,name:'Aero Wireless Headphones',price:4999,category:'tech',img:'https://images.unsplash.com/photo-1518444020308-9fbdde3d5f11?w=800'},
-  {id:2,name:'Lumen Desk Lamp',price:2999,category:'home',img:'https://images.unsplash.com/photo-1534751516642-a1af1ef0b6e7?w=800'},
-  {id:3,name:'Pulse Smartwatch',price:9999,category:'tech',img:'https://images.unsplash.com/photo-1541534401786-5a6f8aa5a1c1?w=800'},
-  {id:4,name:'Fitness Pack',price:2599,category:'lifestyle',img:'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=800'},
-  {id:5,name:'Ceramic Mug',price:599,category:'home',img:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800'}
+/* Basic sample data and UI interactions for the mock store */
+const products = [
+  { id: 1, title: "Wireless Headphones", price: 2499, category: "tech", img: "https://images.unsplash.com/photo-1518444020308-9fbdde3d5f11?w=800&q=60" },
+  { id: 2, title: "LED Desk Lamp", price: 1199, category: "home", img: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=800&q=60" },
+  { id: 3, title: "Mechanical Keyboard", price: 3499, category: "tech", img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=60" },
+  { id: 4, title: "Ceramic Mug - 2 pack", price: 499, category: "home", img: "https://images.unsplash.com/photo-1517685352821-92cf88aee5a5?w=800&q=60" },
+  { id: 5, title: "Intro to JS - Paperback", price: 899, category: "books", img: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=60" },
+  { id: 6, title: "Smart Watch", price: 5999, category: "tech", img: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800&q=60" }
 ];
 
-let state={products:[...PRODUCTS],cart:{}};
+let cart = {}; // { productId: qty }
 
-const grid=document.getElementById('productGrid');
-const count=document.getElementById('count');
-const q=document.getElementById('q');
-const sort=document.getElementById('sort');
-const category=document.getElementById('category');
-const cartBtn=document.getElementById('cartBtn');
-const cartPanel=document.getElementById('cartPanel');
-const cartItems=document.getElementById('cartItems');
-const cartTotal=document.getElementById('cartTotal');
-const cartCount=document.getElementById('cartCount');
-const closeCart=document.getElementById('closeCart');
+const grid = document.getElementById("product-grid");
+const cartCountEl = document.getElementById("cart-count");
+const cartModal = document.getElementById("cart-modal");
+const cartItemsEl = document.getElementById("cart-items");
+const cartTotalEl = document.getElementById("cart-total");
+const searchInput = document.getElementById("search-input");
+const searchBtn = document.getElementById("search-btn");
+const categorySelect = document.getElementById("category-select");
 
-document.getElementById('year').innerText=new Date().getFullYear();
+function formatRupee(n){ return n.toLocaleString('en-IN'); }
 
 function renderProducts(list){
-  grid.innerHTML='';
-  list.forEach(p=>{
-    const card=document.createElement('div');
-    card.className='card';
-    card.innerHTML=`
-      <img src="${p.img}" alt="${p.name}" />
-      <h3>${p.name}</h3>
-      <p>₹${p.price}</p>
-      <div class="card-footer">
-        <span>${p.category}</span>
-        <button class="btn btn-primary" data-id="${p.id}">Add</button>
+  grid.innerHTML = "";
+  if(list.length === 0){
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:20px;color:var(--muted)">No products found.</div>`;
+    return;
+  }
+  list.forEach(p => {
+    const card = document.createElement("article");
+    card.className = "product-card";
+    card.setAttribute("role","listitem");
+    card.innerHTML = `
+      <div class="product-media"><img src="${p.img}" alt="${p.title}" loading="lazy"/></div>
+      <div class="product-title">${p.title}</div>
+      <div class="product-price">₹${formatRupee(p.price)}</div>
+      <div class="card-actions">
+        <button class="small-btn add-btn" data-id="${p.id}">Add to cart</button>
+        <button class="small-btn" onclick="alert('Quick view: ${p.title}\\nPrice: ₹${formatRupee(p.price)}')">Quick view</button>
       </div>
     `;
-    grid.append(card);
+    grid.appendChild(card);
   });
-
-  count.innerText=list.length;
-
-  document.querySelectorAll('[data-id]').forEach(btn=>{
-    btn.onclick=()=>addToCart(parseInt(btn.dataset.id));
+  // attach add handlers
+  document.querySelectorAll(".add-btn").forEach(b=>{
+    b.addEventListener("click", e=>{
+      const id = Number(e.currentTarget.dataset.id);
+      addToCart(id);
+    });
   });
-}
-
-function applyFilters(){
-  let list=[...PRODUCTS];
-  const query=q.value.toLowerCase();
-  const cat=category.value;
-
-  if(query) list=list.filter(p=>p.name.toLowerCase().includes(query));
-  if(cat!=='all') list=list.filter(p=>p.category===cat);
-
-  if(sort.value==='price-asc') list.sort((a,b)=>a.price-b.price);
-  if(sort.value==='price-desc') list.sort((a,b)=>b.price-a.price);
-
-  renderProducts(list);
 }
 
 function addToCart(id){
-  const p=PRODUCTS.find(x=>x.id===id);
-  if(!state.cart[id]) state.cart[id]={...p,qty:0};
-  state.cart[id].qty++;
-  updateCart();
+  cart[id] = (cart[id] || 0) + 1;
+  updateCartUI();
 }
 
-function updateCart(){
-  const items=Object.values(state.cart);
-  cartItems.innerHTML='';
-  let total=0;
+function removeFromCart(id){
+  delete cart[id];
+  updateCartUI();
+}
 
-  items.forEach(it=>{
-    total+=it.price*it.qty;
-    const div=document.createElement('div');
-    div.className='cart-item';
-    div.innerHTML=`
-      <div class="cart-thumb"><img src="${it.img}"></div>
-      <div style="flex:1">
-        <b>${it.name}</b><br>
-        Qty: ${it.qty}
+function updateCartUI(){
+  const count = Object.values(cart).reduce((s,v)=>s+v,0);
+  cartCountEl.textContent = count;
+  // render cart modal contents
+  cartItemsEl.innerHTML = "";
+  let total = 0;
+  for(const [idStr, qty] of Object.entries(cart)){
+    const id = Number(idStr);
+    const p = products.find(x=>x.id===id);
+    if(!p) continue;
+    const li = document.createElement("li");
+    li.className = "cart-item";
+    li.innerHTML = `
+      <img src="${p.img}" alt="${p.title}" />
+      <div class="meta">
+        <div style="font-weight:600">${p.title}</div>
+        <div style="color:var(--muted)">₹${formatRupee(p.price)} × ${qty}</div>
+        <div style="margin-top:8px">
+          <button class="small-btn dec" data-id="${id}">-</button>
+          <button class="small-btn inc" data-id="${id}">+</button>
+          <button class="small-btn" data-id="${id}" style="margin-left:8px">Remove</button>
+        </div>
       </div>
-      <button class="btn btn-ghost" data-dec="${it.id}">-</button>
-      <button class="btn btn-ghost" data-inc="${it.id}">+</button>
     `;
-    cartItems.append(div);
-  });
+    cartItemsEl.appendChild(li);
+    total += p.price * qty;
+  }
+  cartTotalEl.textContent = formatRupee(total);
 
-  document.querySelectorAll('[data-inc]').forEach(b=> b.onclick=()=>{ state.cart[b.dataset.inc].qty++; updateCart(); });
-  document.querySelectorAll('[data-dec]').forEach(b=> b.onclick=()=>{
-    const item=state.cart[b.dataset.dec];
-    item.qty--; if(item.qty<=0) delete state.cart[b.dataset.dec];
-    updateCart();
+  // attach inc/dec/remove handlers
+  cartItemsEl.querySelectorAll(".inc").forEach(b=>b.addEventListener("click", e=>{
+    const id = Number(e.currentTarget.dataset.id);
+    cart[id] = (cart[id] || 0) + 1;
+    updateCartUI();
+  }));
+  cartItemsEl.querySelectorAll(".dec").forEach(b=>b.addEventListener("click", e=>{
+    const id = Number(e.currentTarget.dataset.id);
+    if(!cart[id]) return;
+    cart[id]--;
+    if(cart[id] <= 0) delete cart[id];
+    updateCartUI();
+  }));
+  cartItemsEl.querySelectorAll(".small-btn[data-id]").forEach(b=>{
+    if(b.textContent.trim() === "Remove"){
+      b.addEventListener("click", e=>{
+        const id = Number(e.currentTarget.dataset.id);
+        removeFromCart(id);
+      });
+    }
   });
-
-  cartTotal.innerText='₹'+total;
-  cartCount.innerText=items.reduce((s,i)=>s+i.qty,0);
-  cartCount.style.display=items.length? 'inline-block' : 'none';
 }
 
-cartBtn.onclick=()=> cartPanel.style.display='block';
-closeCart.onclick=()=> cartPanel.style.display='none';
+function openCart(){
+  cartModal.setAttribute("aria-hidden","false");
+}
+function closeCart(){
+  cartModal.setAttribute("aria-hidden","true");
+}
 
-q.oninput=applyFilters;
-sort.onchange=applyFilters;
-category.onchange=applyFilters;
+document.getElementById("cart-btn").addEventListener("click", openCart);
+document.getElementById("close-cart").addEventListener("click", closeCart);
+cartModal.addEventListener("click", e => {
+  if(e.target === cartModal) closeCart();
+});
+document.getElementById("checkout").addEventListener("click", ()=>{
+  if(Object.keys(cart).length === 0){
+    alert("Your cart is empty.");
+    return;
+  }
+  alert("Checkout simulated. Thanks for trying the mock store!");
+  cart = {};
+  updateCartUI();
+  closeCart();
+});
 
-applyFilters();
+// Search & filters
+function applyFilters(){
+  const q = searchInput.value.trim().toLowerCase();
+  const cat = categorySelect.value;
+  let list = products.slice();
+  if(cat !== "all"){
+    list = list.filter(p => p.category === cat);
+  }
+  if(q){
+    list = list.filter(p => p.title.toLowerCase().includes(q));
+  }
+  renderProducts(list);
+}
+searchBtn.addEventListener("click", applyFilters);
+searchInput.addEventListener("keydown", e => { if(e.key === "Enter") applyFilters(); });
+categorySelect.addEventListener("change", applyFilters);
+
+// init
+document.getElementById("year").textContent = new Date().getFullYear();
+renderProducts(products);
+updateCartUI();
+document.getElementById("shop-now").addEventListener("click", ()=> window.scrollTo({top: document.querySelector(".products-section").offsetTop - 20, behavior:"smooth"}));

@@ -3,75 +3,82 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NovaShop — E-Commerce</title>
+  <title>Shoply — Mock E-commerce</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="brand">
-        <div class="logo">NS</div>
-        <div>
-          <div class="brand-title">NovaShop</div>
-          <div class="brand-sub">Curated goods · Fast shipping</div>
-        </div>
+  <header class="site-header">
+    <div class="topbar">
+      <div class="logo">Shoply</div>
+      <div class="search-wrap">
+        <select id="category-select" aria-label="Category">
+          <option value="all">All</option>
+          <option value="tech">Tech</option>
+          <option value="home">Home</option>
+          <option value="books">Books</option>
+        </select>
+        <input id="search-input" type="search" placeholder="Search products, brands and more" aria-label="Search" />
+        <button id="search-btn">Search</button>
       </div>
-
-      <div class="search">
-        <input id="q" placeholder="Search products..." />
-        <span class="icon">🔍</span>
+      <div class="actions">
+        <button id="account-btn" class="text-btn">Account</button>
+        <button id="cart-btn" class="cart-btn" aria-label="Open cart">
+          🛒 <span id="cart-count">0</span>
+        </button>
       </div>
+    </div>
 
-      <nav>
-        <a class="nav-link" href="#">Collections</a>
-        <a class="nav-link" href="#">New</a>
-        <a class="nav-link" href="#">Sale</a>
-        <button class="btn btn-ghost cart-btn" id="cartBtn">Cart <span class="badge" id="cartCount"></span></button>
-      </nav>
-    </header>
+    <nav class="nav-bar">
+      <a href="#" class="nav-link">Deals</a>
+      <a href="#" class="nav-link">Customer Service</a>
+      <a href="#" class="nav-link">Gift Cards</a>
+      <a href="#" class="nav-link">Sell</a>
+    </nav>
+  </header>
 
+  <main>
     <section class="hero">
-      <div class="hero-card">
-        <h1>Design-forward products, delivered fast.</h1>
-        <p>Shop curated tech, lifestyle, and home essentials.</p>
-        <button class="btn btn-primary" id="shopNow">Shop Now</button>
+      <div class="hero-content">
+        <h1>Welcome to Shoply — Your online marketplace</h1>
+        <p>Handpicked deals, free shipping over ₹999, and easy returns.</p>
+        <button id="shop-now" class="primary">Shop Now</button>
       </div>
-      <div class="hero-card image-card">
-        <img src="hero.jpg" alt="Hero" />
-      </div>
+      <div class="hero-image" aria-hidden="true"></div>
     </section>
 
-    <div class="toolbar">
-      <select id="sort" class="select">
-        <option value="popular">Sort: Popular</option>
-        <option value="price-asc">Low → High</option>
-        <option value="price-desc">High → Low</option>
-      </select>
+    <section class="products-section">
+      <h2>Featured products</h2>
+      <div id="product-grid" class="product-grid" role="list"></div>
+    </section>
 
-      <select id="category" class="select">
-        <option value="all">All Categories</option>
-        <option value="tech">Tech</option>
-        <option value="home">Home</option>
-        <option value="lifestyle">Lifestyle</option>
-      </select>
+    <section class="about">
+      <h3>About this mock store</h3>
+      <p>This is a simple, responsive example to learn HTML/CSS/JS for an e-commerce front end. All product images are placeholders.</p>
+    </section>
+  </main>
 
-      <div>Showing <span id="count">0</span> items</div>
+  <footer class="site-footer">
+    <div>© <span id="year"></span> Shoply — Mock store</div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Help</a>
     </div>
+  </footer>
 
-    <main>
-      <div class="grid" id="productGrid"></div>
-    </main>
-
-    <div class="cart-panel" id="cartPanel">
-      <button id="closeCart" class="btn btn-ghost">Close</button>
-      <div id="cartItems"></div>
-      <h3>Total: <span id="cartTotal">₹0</span></h3>
-      <button class="btn btn-primary" style="width:100%">Checkout</button>
+  <!-- Cart modal -->
+  <div id="cart-modal" class="cart-modal" aria-hidden="true">
+    <div class="cart-panel" role="dialog" aria-labelledby="cart-title">
+      <button id="close-cart" class="close-btn" aria-label="Close cart">✕</button>
+      <h3 id="cart-title">Your cart</h3>
+      <ul id="cart-items" class="cart-items"></ul>
+      <div class="cart-footer">
+        <div class="cart-total">Total: ₹<span id="cart-total">0</span></div>
+        <button id="checkout" class="primary">Checkout</button>
+      </div>
     </div>
-
-    <footer>© <span id="year"></span> NovaShop — Demo E-Commerce Site</footer>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
