@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NovaShop — E-Commerce</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">NS</div>
+        <div>
+          <div class="brand-title">NovaShop</div>
+          <div class="brand-sub">Curated goods · Fast shipping</div>
+        </div>
+      </div>
+
+      <div class="search">
+        <input id="q" placeholder="Search products..." />
+        <span class="icon">🔍</span>
+      </div>
+
+      <nav>
+        <a class="nav-link" href="#">Collections</a>
+        <a class="nav-link" href="#">New</a>
+        <a class="nav-link" href="#">Sale</a>
+        <button class="btn btn-ghost cart-btn" id="cartBtn">Cart <span class="badge" id="cartCount"></span></button>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-card">
+        <h1>Design-forward products, delivered fast.</h1>
+        <p>Shop curated tech, lifestyle, and home essentials.</p>
+        <button class="btn btn-primary" id="shopNow">Shop Now</button>
+      </div>
+      <div class="hero-card image-card">
+        <img src="hero.jpg" alt="Hero" />
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <select id="sort" class="select">
+        <option value="popular">Sort: Popular</option>
+        <option value="price-asc">Low → High</option>
+        <option value="price-desc">High → Low</option>
+      </select>
+
+      <select id="category" class="select">
+        <option value="all">All Categories</option>
+        <option value="tech">Tech</option>
+        <option value="home">Home</option>
+        <option value="lifestyle">Lifestyle</option>
+      </select>
+
+      <div>Showing <span id="count">0</span> items</div>
+    </div>
+
+    <main>
+      <div class="grid" id="productGrid"></div>
+    </main>
+
+    <div class="cart-panel" id="cartPanel">
+      <button id="closeCart" class="btn btn-ghost">Close</button>
+      <div id="cartItems"></div>
+      <h3>Total: <span id="cartTotal">₹0</span></h3>
+      <button class="btn btn-primary" style="width:100%">Checkout</button>
+    </div>
+
+    <footer>© <span id="year"></span> NovaShop — Demo E-Commerce Site</footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
